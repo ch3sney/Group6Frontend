@@ -9,7 +9,7 @@ public class Main {
         int choice = menu(true);
         switch(choice) {
             case 1:
-                // rent equipment
+                rentEquipment();
                 break;
             case 2:
                 // return equipment
@@ -56,5 +56,9 @@ public class Main {
             }
             System.out.println("Invalid selection! Please enter a number between 1 and " + options.length + ".");
         }
+    }
+
+    private static void rentEquipment() {
+        System.out.println("No op");
     }
 }
