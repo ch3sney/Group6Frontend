@@ -325,11 +325,21 @@ public class Main {
         System.out.print("Enter Dimensions: ");
         String dimensions = scanner.nextLine();
 
-        System.out.print("Enter Weight: ");
-        double weight = Double.parseDouble(scanner.nextLine());
+        System.out.print("Enter Weight (numeric): ");
+        double weight = 0.0;
+        try {
+            weight = Double.parseDouble(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input for weight, defaulting to 0.0");
+        }
 
-        System.out.print("Enter Year: ");
-        int year = Integer.parseInt(scanner.nextLine());
+        System.out.print("Enter Year (integer): ");
+        int year = 0;
+        try {
+            year = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input for year, defaulting to 0");
+        }
 
         System.out.print("Enter Description: ");
         String description = scanner.nextLine();
