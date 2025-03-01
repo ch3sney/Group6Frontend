@@ -91,7 +91,6 @@ public class Equipment {
         this.location = location;
     }
 
-    // For easy debugging / logging
     @Override
     public String toString() {
         return "Equipment{" +
