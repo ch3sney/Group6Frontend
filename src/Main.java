@@ -23,6 +23,12 @@ public class Main {
                     pickupEquipment();
                     break;
                 case 5:
+                    droneManager();
+                    break;
+                case 6:
+                    equipmentManager();
+                    break;
+                case 7:
                     System.out.println("Exiting application. Goodbye!");
                     running = false;
                     break;
@@ -42,8 +48,8 @@ public class Main {
                 "2 - Return equipment (NOOP)",
                 "3 - Deliver equipment (NOOP)",
                 "4 - Pick up equipment (NOOP)",
-                "5 - Equipment manager",
-                "6 - Drone manager",
+                "5 - Drone manager",
+                "6 - Equipment manager",
                 "7 - Exit"
         };
 
@@ -80,5 +86,13 @@ public class Main {
 
     private static void pickupEquipment() {
         System.out.println("Picking up equipment... [No operation]");
+    }
+
+    private static void droneManager() {
+        System.out.println("Drone manager menu... [No operation]");
+    }
+
+    private static void equipmentManager() {
+        System.out.println("Equipment manager menu... [No operation]");
     }
 }
