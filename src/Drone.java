@@ -1,56 +1,91 @@
+import java.time.LocalDate;
+
 public class Drone {
-    private String serialNumber;
-    private String model;
-    private double maxPayload;
-    private double batteryLife;
-    private String status;
-    private String location;
+
+    private String serial;              // maps to "Serial"
+    private int manufacturer;           // maps to "Manufacturer" (FK to ManufacturerID)
+    private double weightCapacity;      // maps to "WeightCapacity"
+    private int yearManufactured;       // maps to "YearManufactured"
+    private double distanceAutonomy;    // maps to "DistanceAutonomy"
+    private String status;              // maps to "Status"
+    private double maxSpeed;            // maps to "MaxSpeed"
+    private String name;                // maps to "Name"
+    private LocalDate warrantyExpiration; // maps to "WarrantyExpiration"
+    private String model;               // maps to "Model"
+    private String currentLocation;     // maps to "CurrentLocation"
+    private String warehouseAddr;       // maps to "WarehouseAddr"
 
     // No-argument constructor
     public Drone() {
     }
 
     // Parameterized constructor
-    public Drone(String serialNumber, String model, double maxPayload,
-                 double batteryLife, String status, String location) {
-        this.serialNumber = serialNumber;
-        this.model = model;
-        this.maxPayload = maxPayload;
-        this.batteryLife = batteryLife;
+    public Drone(String serial,
+                 int manufacturer,
+                 double weightCapacity,
+                 int yearManufactured,
+                 double distanceAutonomy,
+                 String status,
+                 double maxSpeed,
+                 String name,
+                 LocalDate warrantyExpiration,
+                 String model,
+                 String currentLocation,
+                 String warehouseAddr) {
+        this.serial = serial;
+        this.manufacturer = manufacturer;
+        this.weightCapacity = weightCapacity;
+        this.yearManufactured = yearManufactured;
+        this.distanceAutonomy = distanceAutonomy;
         this.status = status;
-        this.location = location;
-    }
-
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(String serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
+        this.maxSpeed = maxSpeed;
+        this.name = name;
+        this.warrantyExpiration = warrantyExpiration;
         this.model = model;
+        this.currentLocation = currentLocation;
+        this.warehouseAddr = warehouseAddr;
     }
 
-    public double getMaxPayload() {
-        return maxPayload;
+    // Getters and Setters
+
+    public String getSerial() {
+        return serial;
     }
 
-    public void setMaxPayload(double maxPayload) {
-        this.maxPayload = maxPayload;
+    public void setSerial(String serial) {
+        this.serial = serial;
     }
 
-    public double getBatteryLife() {
-        return batteryLife;
+    public int getManufacturer() {
+        return manufacturer;
     }
 
-    public void setBatteryLife(double batteryLife) {
-        this.batteryLife = batteryLife;
+    public void setManufacturer(int manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+
+    public double getWeightCapacity() {
+        return weightCapacity;
+    }
+
+    public void setWeightCapacity(double weightCapacity) {
+        this.weightCapacity = weightCapacity;
+    }
+
+    public int getYearManufactured() {
+        return yearManufactured;
+    }
+
+    public void setYearManufactured(int yearManufactured) {
+        this.yearManufactured = yearManufactured;
+    }
+
+    public double getDistanceAutonomy() {
+        return distanceAutonomy;
+    }
+
+    public void setDistanceAutonomy(double distanceAutonomy) {
+        this.distanceAutonomy = distanceAutonomy;
     }
 
     public String getStatus() {
@@ -61,23 +96,69 @@ public class Drone {
         this.status = status;
     }
 
-    public String getLocation() {
-        return location;
+    public double getMaxSpeed() {
+        return maxSpeed;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public LocalDate getWarrantyExpiration() {
+        return warrantyExpiration;
+    }
+
+    public void setWarrantyExpiration(LocalDate warrantyExpiration) {
+        this.warrantyExpiration = warrantyExpiration;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public String getWarehouseAddr() {
+        return warehouseAddr;
+    }
+
+    public void setWarehouseAddr(String warehouseAddr) {
+        this.warehouseAddr = warehouseAddr;
     }
 
     @Override
     public String toString() {
         return "Drone{" +
-                "serialNumber='" + serialNumber + '\'' +
-                ", model='" + model + '\'' +
-                ", maxPayload=" + maxPayload +
-                ", batteryLife=" + batteryLife +
+                "serial='" + serial + '\'' +
+                ", manufacturer=" + manufacturer +
+                ", weightCapacity=" + weightCapacity +
+                ", yearManufactured=" + yearManufactured +
+                ", distanceAutonomy=" + distanceAutonomy +
                 ", status='" + status + '\'' +
-                ", location='" + location + '\'' +
+                ", maxSpeed=" + maxSpeed +
+                ", name='" + name + '\'' +
+                ", warrantyExpiration=" + warrantyExpiration +
+                ", model='" + model + '\'' +
+                ", currentLocation='" + currentLocation + '\'' +
+                ", warehouseAddr='" + warehouseAddr + '\'' +
                 '}';
     }
 }

@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Main {
@@ -140,101 +142,250 @@ public class Main {
 
     // Add drone
     private static void addDrone() {
-        System.out.print("Enter Drone ID: ");
-        String droneId = scanner.nextLine();
+        // Prompt user for each field
+        System.out.print("Enter Drone ID (Serial): ");
+        String serial = scanner.nextLine();
+
+        System.out.print("Enter Manufacturer ID (integer): ");
+        int manufacturer = 0;
+        try {
+            manufacturer = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid Manufacturer ID. Defaulting to 0.");
+        }
+
+        System.out.print("Enter Weight Capacity (numeric): ");
+        double weightCapacity = 0.0;
+        try {
+            weightCapacity = Double.parseDouble(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Defaulting to 0.0.");
+        }
+
+        System.out.print("Enter Year Manufactured (e.g. 2023): ");
+        int yearManufactured = 0;
+        try {
+            yearManufactured = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid year. Defaulting to 0.");
+        }
+
+        System.out.print("Enter Distance Autonomy (numeric): ");
+        double distanceAutonomy = 0.0;
+        try {
+            distanceAutonomy = Double.parseDouble(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Defaulting to 0.0.");
+        }
+
+        System.out.print("Enter Status (Available, In Use, Maintenance, Retired): ");
+        String status = scanner.nextLine();
+
+        System.out.print("Enter Max Speed (numeric): ");
+        double maxSpeed = 0.0;
+        try {
+            maxSpeed = Double.parseDouble(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Defaulting to 0.0.");
+        }
+
+        System.out.print("Enter Drone Name (optional): ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter Warranty Expiration (YYYY-MM-DD) or leave blank: ");
+        String wExpInput = scanner.nextLine();
+        LocalDate warrantyExpiration = null;
+        if (!wExpInput.trim().isEmpty()) {
+            try {
+                warrantyExpiration = LocalDate.parse(wExpInput);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format, ignoring warranty expiration.");
+            }
+        }
 
         System.out.print("Enter Model: ");
         String model = scanner.nextLine();
 
-        System.out.print("Enter Max Payload (numeric): ");
-        double maxPayload = 0.0;
-        try {
-            maxPayload = Double.parseDouble(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input for payload, defaulting to 0.0.");
-        }
+        System.out.print("Enter Current Location: ");
+        String currentLocation = scanner.nextLine();
 
-        System.out.print("Enter Battery Life (numeric): ");
-        double batteryLife = 0.0;
-        try {
-            batteryLife = Double.parseDouble(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input for battery life, defaulting to 0.0");
-        }
+        System.out.print("Enter Warehouse Address (optional): ");
+        String warehouseAddr = scanner.nextLine();
 
-        System.out.print("Enter Status (e.g. Available, In Use): ");
-        String status = scanner.nextLine();
+        // Create the new Drone object
+        Drone newDrone = new Drone(
+                serial,
+                manufacturer,
+                weightCapacity,
+                yearManufactured,
+                distanceAutonomy,
+                status,
+                maxSpeed,
+                name,
+                warrantyExpiration,
+                model,
+                currentLocation,
+                warehouseAddr
+        );
 
-        System.out.print("Enter Location: ");
-        String location = scanner.nextLine();
-
-        // Create new Drone object
-        Drone newDrone = new Drone(droneId, model, maxPayload, batteryLife, status, location);
-
-        // Add to DroneManager
+        // call the manager to insert into the DB
         DroneManager.addDrone(newDrone);
+        System.out.println("Drone added successfully!");
     }
 
-    // Edit drone
+    // edit drone
     private static void editDrone() {
-        System.out.print("Enter the Drone ID of the drone to edit: ");
+        System.out.print("Enter the Drone Serial (primary key) of the drone to edit: ");
         String serialNumber = scanner.nextLine();
 
+        // Load existing record from DB
         Drone existing = DroneManager.findBySerialNumber(serialNumber);
         if (existing == null) {
-            System.out.println("No drone found with ID: " + serialNumber);
+            System.out.println("No drone found with that serial: " + serialNumber);
             return;
         }
 
-        System.out.println("Leave blank to keep current value.");
+        System.out.println("Leave any field blank to keep the existing value.");
 
-        // Model
-        System.out.print("Enter new Model [" + existing.getModel() + "]: ");
-        String newModel = scanner.nextLine();
-        if (!newModel.isEmpty()) {
-            existing.setModel(newModel);
-        }
-
-        // Max Payload (numeric)
-        System.out.print("Enter new Max Payload [" + existing.getMaxPayload() + "]: ");
-        String inputPayload = scanner.nextLine();
-        if (!inputPayload.isEmpty()) {
+        // Manufacturer (int)
+        System.out.print("Manufacturer [" + existing.getManufacturer() + "]: ");
+        String manufacturerInput = scanner.nextLine();
+        int manufacturer = existing.getManufacturer();
+        if (!manufacturerInput.isEmpty()) {
             try {
-                double newPayload = Double.parseDouble(inputPayload);
-                existing.setMaxPayload(newPayload);
+                manufacturer = Integer.parseInt(manufacturerInput);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input for payload. Keeping existing value.");
+                System.out.println("Invalid input. Keeping existing value.");
             }
         }
 
-        // Battery Life (numeric)
-        System.out.print("Enter new Battery Life [" + existing.getBatteryLife() + "]: ");
-        String inputBattery = scanner.nextLine();
-        if (!inputBattery.isEmpty()) {
+        // WeightCapacity (double)
+        System.out.print("Weight Capacity [" + existing.getWeightCapacity() + "]: ");
+        String weightCapInput = scanner.nextLine();
+        double weightCapacity = existing.getWeightCapacity();
+        if (!weightCapInput.isEmpty()) {
             try {
-                double newBatteryLife = Double.parseDouble(inputBattery);
-                existing.setBatteryLife(newBatteryLife);
+                weightCapacity = Double.parseDouble(weightCapInput);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input for battery life. Keeping existing value.");
+                System.out.println("Invalid input. Keeping existing value.");
             }
         }
 
-        // Status
-        System.out.print("Enter new Status [" + existing.getStatus() + "]: ");
-        String newStatus = scanner.nextLine();
-        if (!newStatus.isEmpty()) {
-            existing.setStatus(newStatus);
+        // YearManufactured (int)
+        System.out.print("Year Manufactured [" + existing.getYearManufactured() + "]: ");
+        String yearInput = scanner.nextLine();
+        int yearManufactured = existing.getYearManufactured();
+        if (!yearInput.isEmpty()) {
+            try {
+                yearManufactured = Integer.parseInt(yearInput);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Keeping existing value.");
+            }
         }
 
-        // Location
-        System.out.print("Enter new Location [" + existing.getLocation() + "]: ");
-        String newLocation = scanner.nextLine();
-        if (!newLocation.isEmpty()) {
-            existing.setLocation(newLocation);
+        // DistanceAutonomy (double)
+        System.out.print("Distance Autonomy [" + existing.getDistanceAutonomy() + "]: ");
+        String distanceInput = scanner.nextLine();
+        double distanceAutonomy = existing.getDistanceAutonomy();
+        if (!distanceInput.isEmpty()) {
+            try {
+                distanceAutonomy = Double.parseDouble(distanceInput);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Keeping existing value.");
+            }
         }
 
-        System.out.println("Drone updated.");
+        // Status (String)
+        System.out.print("Status [" + existing.getStatus() + "]: ");
+        String statusInput = scanner.nextLine();
+        String status = existing.getStatus();
+        if (!statusInput.isEmpty()) {
+            status = statusInput;
+        }
+
+        // MaxSpeed (double)
+        System.out.print("Max Speed [" + existing.getMaxSpeed() + "]: ");
+        String maxSpeedInput = scanner.nextLine();
+        double maxSpeed = existing.getMaxSpeed();
+        if (!maxSpeedInput.isEmpty()) {
+            try {
+                maxSpeed = Double.parseDouble(maxSpeedInput);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Keeping existing value.");
+            }
+        }
+
+        // Name (String)
+        System.out.print("Drone Name [" + existing.getName() + "]: ");
+        String nameInput = scanner.nextLine();
+        String name = existing.getName();
+        if (!nameInput.isEmpty()) {
+            name = nameInput;
+        }
+
+        // WarrantyExpiration (LocalDate)
+        System.out.print("Warranty Expiration (YYYY-MM-DD) ["
+                + (existing.getWarrantyExpiration() != null
+                ? existing.getWarrantyExpiration() : "null") + "]: ");
+        String warrantyInput = scanner.nextLine();
+        LocalDate warrantyExpiration = existing.getWarrantyExpiration();
+        if (!warrantyInput.isEmpty()) {
+            try {
+                warrantyExpiration = LocalDate.parse(warrantyInput);
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Keeping existing value.");
+            }
+        }
+
+        // Model (String)
+        System.out.print("Model [" + existing.getModel() + "]: ");
+        String modelInput = scanner.nextLine();
+        String model = existing.getModel();
+        if (!modelInput.isEmpty()) {
+            model = modelInput;
+        }
+
+        // CurrentLocation (String)
+        System.out.print("Current Location [" + existing.getCurrentLocation() + "]: ");
+        String locationInput = scanner.nextLine();
+        String currentLocation = existing.getCurrentLocation();
+        if (!locationInput.isEmpty()) {
+            currentLocation = locationInput;
+        }
+
+        // WarehouseAddr (String)
+        System.out.print("Warehouse Address [" + existing.getWarehouseAddr() + "]: ");
+        String warehouseAddrInput = scanner.nextLine();
+        String warehouseAddr = existing.getWarehouseAddr();
+        if (!warehouseAddrInput.isEmpty()) {
+            warehouseAddr = warehouseAddrInput;
+        }
+
+        // Create a new Drone with updated data (same serial #, updated fields)
+        Drone updatedDrone = new Drone(
+                existing.getSerial(),    // keep the same Serial (PK)
+                manufacturer,
+                weightCapacity,
+                yearManufactured,
+                distanceAutonomy,
+                status,
+                maxSpeed,
+                name,
+                warrantyExpiration,
+                model,
+                currentLocation,
+                warehouseAddr
+        );
+
+        // Save changes in the DB
+        boolean success = DroneManager.updateDrone(serialNumber, updatedDrone);
+        if (success) {
+            System.out.println("Drone updated successfully.");
+        } else {
+            System.out.println("Drone update failed (no rows affected).");
+        }
     }
+
 
     // Delete
     private static void deleteDrone() {

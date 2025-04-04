@@ -1,58 +1,171 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
+import java.time.LocalDate;
 
 public class DroneManager {
-    // Static list for checkpoint 2
-    private static final List<Drone> droneList = new ArrayList<>();
 
-    // Create
+    // CREATE (INSERT)
     public static void addDrone(Drone drone) {
-        droneList.add(drone);
-        System.out.println("Drone added: " + drone);
-    }
+        String sql = "INSERT INTO Drone (Serial, Manufacturer, WeightCapacity, YearManufactured, DistanceAutonomy, "
+                + "Status, MaxSpeed, Name, WarrantyExpiration, Model, CurrentLocation, WarehouseAddr) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    // Search by serial number
-    public static Drone findBySerialNumber(String serialNumber) {
-        for (Drone d : droneList) {
-            if (d.getSerialNumber().equalsIgnoreCase(serialNumber)) {
-                return d;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1,  drone.getSerial());
+            pstmt.setInt(2,    drone.getManufacturer());
+            pstmt.setDouble(3, drone.getWeightCapacity());
+            pstmt.setInt(4,    drone.getYearManufactured());
+            pstmt.setDouble(5, drone.getDistanceAutonomy());
+            pstmt.setString(6, drone.getStatus());
+            pstmt.setDouble(7, drone.getMaxSpeed());
+            pstmt.setString(8, drone.getName());
+            if (drone.getWarrantyExpiration() != null) {
+                pstmt.setString(9, drone.getWarrantyExpiration().toString());
+            } else {
+                pstmt.setNull(9, Types.VARCHAR);
             }
+
+            pstmt.setString(10, drone.getModel());
+            pstmt.setString(11, drone.getCurrentLocation());
+            pstmt.setString(12, drone.getWarehouseAddr());
+
+            pstmt.executeUpdate();
+            System.out.println("Drone added: " + drone.getSerial());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null; // not found
     }
 
-    // Update
-    public static boolean updateDrone(String droneId, Drone newData) {
-        Drone existing = findBySerialNumber(droneId);
-        if (existing == null) {
-            return false;
+    // READ (SELECT by Serial)
+    public static Drone findBySerialNumber(String serial) {
+        String sql = "SELECT * FROM Drone WHERE Serial = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, serial);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Drone drone = new Drone();
+                    drone.setSerial(rs.getString("Serial"));
+                    drone.setManufacturer(rs.getInt("Manufacturer"));
+                    drone.setWeightCapacity(rs.getDouble("WeightCapacity"));
+                    drone.setYearManufactured(rs.getInt("YearManufactured"));
+                    drone.setDistanceAutonomy(rs.getDouble("DistanceAutonomy"));
+                    drone.setStatus(rs.getString("Status"));
+                    drone.setMaxSpeed(rs.getDouble("MaxSpeed"));
+                    drone.setName(rs.getString("Name"));
+
+                    String wExp = rs.getString("WarrantyExpiration");
+                    if (wExp != null) {
+                        drone.setWarrantyExpiration(LocalDate.parse(wExp));
+                    }
+                    drone.setModel(rs.getString("Model"));
+                    drone.setCurrentLocation(rs.getString("CurrentLocation"));
+                    drone.setWarehouseAddr(rs.getString("WarehouseAddr"));
+                    return drone;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        existing.setModel(newData.getModel());
-        existing.setMaxPayload(newData.getMaxPayload());
-        existing.setBatteryLife(newData.getBatteryLife());
-        existing.setStatus(newData.getStatus());
-        existing.setLocation(newData.getLocation());
-        return true;
+        return null; // Not found or error
     }
 
-    // Delete
-    public static boolean removeDrone(String droneId) {
-        Drone d = findBySerialNumber(droneId);
-        if (d != null) {
-            droneList.remove(d);
-            return true;
+    // UPDATE
+    public static boolean updateDrone(String serial, Drone newData) {
+        String sql = "UPDATE Drone SET "
+                + "Manufacturer = ?, WeightCapacity = ?, YearManufactured = ?, DistanceAutonomy = ?, "
+                + "Status = ?, MaxSpeed = ?, Name = ?, WarrantyExpiration = ?, Model = ?, "
+                + "CurrentLocation = ?, WarehouseAddr = ? "
+                + "WHERE Serial = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1,    newData.getManufacturer());
+            pstmt.setDouble(2, newData.getWeightCapacity());
+            pstmt.setInt(3,    newData.getYearManufactured());
+            pstmt.setDouble(4, newData.getDistanceAutonomy());
+            pstmt.setString(5, newData.getStatus());
+            pstmt.setDouble(6, newData.getMaxSpeed());
+            pstmt.setString(7, newData.getName());
+
+            if (newData.getWarrantyExpiration() != null) {
+                pstmt.setString(8, newData.getWarrantyExpiration().toString());
+            } else {
+                pstmt.setNull(8, Types.VARCHAR);
+            }
+
+            pstmt.setString(9,  newData.getModel());
+            pstmt.setString(10, newData.getCurrentLocation());
+            pstmt.setString(11, newData.getWarehouseAddr());
+            pstmt.setString(12, serial);
+
+            int rowsAffected = pstmt.executeUpdate();
+            return (rowsAffected > 0);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return false;
     }
 
-    // Read
+    // DELETE
+    public static boolean removeDrone(String serial) {
+        String sql = "DELETE FROM Drone WHERE Serial = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, serial);
+            int rowsAffected = pstmt.executeUpdate();
+            return (rowsAffected > 0);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // LIST ALL DRONES
     public static void listAll() {
-        if (droneList.isEmpty()) {
-            System.out.println("No drone records found.");
-        } else {
-            for (Drone d : droneList) {
-                System.out.println(d);
+        String sql = "SELECT * FROM Drone";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            boolean foundAny = false;
+            while (rs.next()) {
+                foundAny = true;
+                Drone drone = new Drone();
+
+                drone.setSerial(rs.getString("Serial"));
+                drone.setManufacturer(rs.getInt("Manufacturer"));
+                drone.setWeightCapacity(rs.getDouble("WeightCapacity"));
+                drone.setYearManufactured(rs.getInt("YearManufactured"));
+                drone.setDistanceAutonomy(rs.getDouble("DistanceAutonomy"));
+                drone.setStatus(rs.getString("Status"));
+                drone.setMaxSpeed(rs.getDouble("MaxSpeed"));
+                drone.setName(rs.getString("Name"));
+
+                String wExp = rs.getString("WarrantyExpiration");
+                if (wExp != null) {
+                    drone.setWarrantyExpiration(LocalDate.parse(wExp));
+                }
+                drone.setModel(rs.getString("Model"));
+                drone.setCurrentLocation(rs.getString("CurrentLocation"));
+                drone.setWarehouseAddr(rs.getString("WarehouseAddr"));
+
+                System.out.println(drone);
             }
+
+            if (!foundAny) {
+                System.out.println("No drone records found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
