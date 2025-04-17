@@ -2,36 +2,25 @@ import java.time.LocalDate;
 
 public class Drone {
 
-    private String serial;              // maps to "Serial"
-    private int manufacturer;           // maps to "Manufacturer" (FK to ManufacturerID)
-    private double weightCapacity;      // maps to "WeightCapacity"
-    private int yearManufactured;       // maps to "YearManufactured"
-    private double distanceAutonomy;    // maps to "DistanceAutonomy"
-    private String status;              // maps to "Status"
-    private double maxSpeed;            // maps to "MaxSpeed"
-    private String name;                // maps to "Name"
-    private LocalDate warrantyExpiration; // maps to "WarrantyExpiration"
-    private String model;               // maps to "Model"
-    private String currentLocation;     // maps to "CurrentLocation"
-    private String warehouseAddr;       // maps to "WarehouseAddr"
+    private String serial;
+    private int manufacturer;
+    private double weightCapacity;
+    private int yearManufactured;
+    private double distanceAutonomy;
+    private String status;
+    private double maxSpeed;
+    private String name;
+    private LocalDate warrantyExpiration;
+    private String model;
+    private String currentLocation;
+    private String warehouseAddr;
 
     // No-argument constructor
     public Drone() {
     }
 
     // Parameterized constructor
-    public Drone(String serial,
-                 int manufacturer,
-                 double weightCapacity,
-                 int yearManufactured,
-                 double distanceAutonomy,
-                 String status,
-                 double maxSpeed,
-                 String name,
-                 LocalDate warrantyExpiration,
-                 String model,
-                 String currentLocation,
-                 String warehouseAddr) {
+    public Drone(String serial, int manufacturer, double weightCapacity, int yearManufactured, double distanceAutonomy, String status, double maxSpeed, String name, LocalDate warrantyExpiration, String model, String currentLocation, String warehouseAddr) {
         this.serial = serial;
         this.manufacturer = manufacturer;
         this.weightCapacity = weightCapacity;
@@ -146,19 +135,6 @@ public class Drone {
 
     @Override
     public String toString() {
-        return "Drone{" +
-                "serial='" + serial + '\'' +
-                ", manufacturer=" + manufacturer +
-                ", weightCapacity=" + weightCapacity +
-                ", yearManufactured=" + yearManufactured +
-                ", distanceAutonomy=" + distanceAutonomy +
-                ", status='" + status + '\'' +
-                ", maxSpeed=" + maxSpeed +
-                ", name='" + name + '\'' +
-                ", warrantyExpiration=" + warrantyExpiration +
-                ", model='" + model + '\'' +
-                ", currentLocation='" + currentLocation + '\'' +
-                ", warehouseAddr='" + warehouseAddr + '\'' +
-                '}';
+        return "Drone{" + "serial='" + serial + '\'' + ", manufacturer=" + manufacturer + ", weightCapacity=" + weightCapacity + ", yearManufactured=" + yearManufactured + ", distanceAutonomy=" + distanceAutonomy + ", status='" + status + '\'' + ", maxSpeed=" + maxSpeed + ", name='" + name + '\'' + ", warrantyExpiration=" + warrantyExpiration + ", model='" + model + '\'' + ", currentLocation='" + currentLocation + '\'' + ", warehouseAddr='" + warehouseAddr + '\'' + '}';
     }
 }

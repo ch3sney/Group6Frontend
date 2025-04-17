@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -7,11 +8,11 @@ public class Main {
 
     public static void main(String[] args) {
         boolean running = true;
-        System.out.println("Welcome to the Drone Delivery Manager!");
+        System.out.println("=== Drone Delivery Manager ===");
 
         while (running) {
             int choice = menu();
-            switch(choice) {
+            switch (choice) {
                 case 1:
                     rentEquipment();
                     break;
@@ -30,7 +31,11 @@ public class Main {
                 case 6:
                     equipmentMenu();
                     break;
+
                 case 7:
+                    reportsMenu();
+                    break;
+                case 8:
                     System.out.println("Exiting application. Goodbye!");
                     running = false;
                     break;
@@ -45,15 +50,7 @@ public class Main {
     private static int menu() {
         System.out.println();
         System.out.println("What would you like to do?");
-        String[] options = {
-                "1 - Rent equipment (NOOP)",
-                "2 - Return equipment (NOOP)",
-                "3 - Deliver equipment (NOOP)",
-                "4 - Pick up equipment (NOOP)",
-                "5 - Drone manager",
-                "6 - Equipment manager",
-                "7 - Exit"
-        };
+        String[] options = {"1 - Rent equipment", "2 - Return equipment", "3 - Deliver equipment", "4 - Pick up equipment", "5 - Drone manager", "6 - Equipment manager", "7 - Useful reports", "8 - Exit"};
 
         for (String option : options) {
             System.out.println(option);
@@ -75,20 +72,119 @@ public class Main {
     }
 
     private static void rentEquipment() {
-        System.out.println("Renting equipment... [No operation]");
+        System.out.print("Serial number of equipment to rent: ");
+        String serial = scanner.nextLine().trim();
+
+        System.out.print("Member ID of renter: ");
+        int memberId;
+        try {
+            memberId = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid member‑ID.");
+            return;
+        }
+
+        System.out.print("Cost per day (e.g. 19.99): ");
+        double costPerDay;
+        try {
+            costPerDay = Double.parseDouble(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
+            return;
+        }
+
+        int rentalId = RentalHelper.checkout(serial, memberId, costPerDay);
+        if (rentalId != -1) System.out.println("Rental created with RentalID = " + rentalId);
     }
 
     private static void returnEquipment() {
-        System.out.println("Returning equipment... [No operation]");
+        System.out.print("Serial number being returned: ");
+        String serial = scanner.nextLine().trim();
+
+        if (RentalHelper.checkin(serial)) System.out.println("Return processed.");
     }
 
     private static void deliverEquipment() {
-        System.out.println("Delivering equipment... [No operation]");
+
+        System.out.print("Member ID to deliver to: ");
+        int memberId;
+        try {
+            memberId = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Bad number.");
+            return;
+        }
+
+        System.out.print("Serial number of equipment being delivered: ");
+        String equipSerial = scanner.nextLine().trim();
+
+        /* List available drones */
+        List<String> drones = DroneManager.listAvailableDrones();
+        if (drones.isEmpty()) {
+            System.out.println("No drones available.");
+            return;
+        }
+
+        System.out.println("Available drones: " + drones);
+        System.out.print("Enter drone serial to use (leave blank for first): ");
+        String drone = scanner.nextLine().trim();
+        if (drone.isEmpty()) drone = drones.get(0);
+        if (!drones.contains(drone)) {
+            System.out.println("Not in the list.");
+            return;
+        }
+
+        System.out.print("Drop‑off date (YYYY‑MM‑DD) or blank for today: ");
+        String dateIn = scanner.nextLine().trim();
+
+        LocalDate dropDate;
+        if (dateIn.isEmpty()) {
+            dropDate = LocalDate.now();
+        } else {
+            dropDate = LocalDate.parse(dateIn);
+        }
+
+        if (DeliveryHelper.scheduleDropoff(memberId, equipSerial, drone, dropDate))
+            System.out.println("Delivery scheduled.");
     }
 
     private static void pickupEquipment() {
-        System.out.println("Picking up equipment... [No operation]");
+        System.out.print("Member ID to pick up from: ");
+        int memberId;
+        try {
+            memberId = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Bad number.");
+            return;
+        }
+
+        System.out.print("Serial number of equipment to pick up: ");
+        String equipSerial = scanner.nextLine().trim();
+
+        /* List available drones */
+        List<String> drones = DroneManager.listAvailableDrones();
+        if (drones.isEmpty()) {
+            System.out.println("No drones available.");
+            return;
+        }
+
+        System.out.println("Available drones: " + drones);
+        System.out.print("Enter drone serial to use (leave blank for first): ");
+        String drone = scanner.nextLine().trim();
+        if (drone.isEmpty()) drone = drones.get(0);
+        if (!drones.contains(drone)) {
+            System.out.println("Not in the list.");
+            return;
+        }
+
+        System.out.print("Pick‑up date (YYYY‑MM‑DD) or blank for today: ");
+        String dateIn = scanner.nextLine().trim();
+        LocalDate pickDate = dateIn.isEmpty() ? LocalDate.now() : LocalDate.parse(dateIn);
+
+        if (DeliveryHelper.schedulePickup(memberId, equipSerial, drone, pickDate))
+            System.out.println("Pick‑up scheduled.");
     }
+
     /*
      *  DRONE MENU
      */
@@ -213,20 +309,7 @@ public class Main {
         String warehouseAddr = scanner.nextLine();
 
         // Create the new Drone object
-        Drone newDrone = new Drone(
-                serial,
-                manufacturer,
-                weightCapacity,
-                yearManufactured,
-                distanceAutonomy,
-                status,
-                maxSpeed,
-                name,
-                warrantyExpiration,
-                model,
-                currentLocation,
-                warehouseAddr
-        );
+        Drone newDrone = new Drone(serial, manufacturer, weightCapacity, yearManufactured, distanceAutonomy, status, maxSpeed, name, warrantyExpiration, model, currentLocation, warehouseAddr);
 
         // call the manager to insert into the DB
         DroneManager.addDrone(newDrone);
@@ -324,9 +407,7 @@ public class Main {
         }
 
         // WarrantyExpiration (LocalDate)
-        System.out.print("Warranty Expiration (YYYY-MM-DD) ["
-                + (existing.getWarrantyExpiration() != null
-                ? existing.getWarrantyExpiration() : "null") + "]: ");
+        System.out.print("Warranty Expiration (YYYY-MM-DD) [" + (existing.getWarrantyExpiration() != null ? existing.getWarrantyExpiration() : "null") + "]: ");
         String warrantyInput = scanner.nextLine();
         LocalDate warrantyExpiration = existing.getWarrantyExpiration();
         if (!warrantyInput.isEmpty()) {
@@ -362,20 +443,8 @@ public class Main {
         }
 
         // Create a new Drone with updated data (same serial #, updated fields)
-        Drone updatedDrone = new Drone(
-                existing.getSerial(),    // keep the same Serial (PK)
-                manufacturer,
-                weightCapacity,
-                yearManufactured,
-                distanceAutonomy,
-                status,
-                maxSpeed,
-                name,
-                warrantyExpiration,
-                model,
-                currentLocation,
-                warehouseAddr
-        );
+        Drone updatedDrone = new Drone(existing.getSerial(),    // keep the same Serial (PK)
+                manufacturer, weightCapacity, yearManufactured, distanceAutonomy, status, maxSpeed, name, warrantyExpiration, model, currentLocation, warehouseAddr);
 
         // Save changes in the DB
         boolean success = DroneManager.updateDrone(serialNumber, updatedDrone);
@@ -498,9 +567,7 @@ public class Main {
         System.out.print("Enter Location: ");
         String location = scanner.nextLine();
 
-        Equipment newEquipment = new Equipment(serialNumber, type, equipModel,
-                dimensions, weight, year,
-                description, location);
+        Equipment newEquipment = new Equipment(serialNumber, type, equipModel, dimensions, weight, year, description, location);
 
         EquipmentManager.addEquipment(newEquipment);
     }
@@ -600,4 +667,57 @@ public class Main {
             System.out.println("No equipment found with that serial number.");
         }
     }
+
+    // Useful reports menu
+    private static void reportsMenu() {
+        boolean exit = false;
+        while (!exit) {
+            switch (showReportsMenu()) {
+                case 1:
+                    UsefulReports.rentingCheckouts(scanner);
+                    return;
+                case 2:
+                    UsefulReports.popularItem();
+                    return;
+                case 3:
+                    UsefulReports.popularManufacturer();
+                    return;
+                case 4:
+                    UsefulReports.popularDrone();
+                    return;
+                case 5:
+                    UsefulReports.itemsCheckedOut();
+                    return;
+                case 6:
+                    UsefulReports.equipmentByTypeBeforeYear(scanner);
+                    return;
+                case 7:
+                    exit = true;
+                default:
+                    System.out.println("Invalid input.");
+            }
+        }
+    }
+
+    // Show reports menu
+    private static int showReportsMenu() {
+        System.out.println("\n=== Useful reports ===");
+        System.out.println("1 - Renting checkouts (by member)");
+        System.out.println("2 - Popular item");
+        System.out.println("3 - Popular manufacturer");
+        System.out.println("4 - Popular drone");
+        System.out.println("5 - Items checked‑out (top member)");
+        System.out.println("6 - Equipment by type released before YEAR");
+        System.out.println("7 - Back to main menu");
+        System.out.print("Enter choice: ");
+
+        if (scanner.hasNextInt()) {
+            int c = scanner.nextInt();
+            scanner.nextLine();
+            return c;
+        }
+        scanner.nextLine();
+        return -1;
+    }
+
 }

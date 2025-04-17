@@ -13,9 +13,7 @@ public class Equipment {
     }
 
     // Parameterized constructor
-    public Equipment(String serialNumber, String type, String equipModel,
-                     String dimensions, double weight, int year,
-                     String description, String location) {
+    public Equipment(String serialNumber, String type, String equipModel, String dimensions, double weight, int year, String description, String location) {
         this.serialNumber = serialNumber;
         this.type = type;
         this.equipModel = equipModel;
@@ -93,15 +91,6 @@ public class Equipment {
 
     @Override
     public String toString() {
-        return "Equipment{" +
-                "serialNumber='" + serialNumber + '\'' +
-                ", type='" + type + '\'' +
-                ", equipModel='" + equipModel + '\'' +
-                ", dimensions='" + dimensions + '\'' +
-                ", weight=" + weight +
-                ", year=" + year +
-                ", description='" + description + '\'' +
-                ", location='" + location + '\'' +
-                '}';
+        return "Equipment{" + "serialNumber='" + serialNumber + '\'' + ", type='" + type + '\'' + ", equipModel='" + equipModel + '\'' + ", dimensions='" + dimensions + '\'' + ", weight=" + weight + ", year=" + year + ", description='" + description + '\'' + ", location='" + location + '\'' + '}';
     }
 }
